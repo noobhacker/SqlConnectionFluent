@@ -11,17 +11,30 @@ namespace SqlConnection.Client
     {
         static void Main(string[] args)
         {
-            var result = new SqlConnectionFluent("connectionstring")
+            var query = new SqlConnectionFluent("connectionstring")
                 .UseStoredProcedure()
                 .SetTimeOut(5 * 60)
                 .SetParameter("a_id", 123)
                 .SetParameter("b_id", "string")
                 .ExecuteQuery<QueryResult>();
 
-            foreach(var item in result)
+            foreach(var item in query)
             {
                 Console.WriteLine(item.ToString());
             }
+
+            var queryWithoutReflection = new SqlConnectionFluent("connectionstring")
+                .UseStoredProcedure()
+                .SetTimeOut(5 * 60)
+                .SetParameter("a_id", 123)
+                .ExecuteQuery();
+
+            var resultWithoutReflection = queryWithoutReflection.Select(r => new QueryResult
+            {
+                id = r.Get<int>("id"),
+                content = r.Get<string>("content"),
+                other_id = r.Get<int>("other_id")
+            });
         }
     }
 

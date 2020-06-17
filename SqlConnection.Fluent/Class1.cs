@@ -73,6 +73,56 @@ namespace SqlConnection.Fluent
             }
             return ts;
         }
-        
+
+        public List<SqlDataRow> ExecuteQuery()
+        {
+            var rows = new List<SqlDataRow>();
+            using (var connection = new System.Data.SqlClient.SqlConnection(_connectionString))
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandType = _commandType;
+                command.CommandTimeout = _timeOut;
+                foreach (var parameter in parameters)
+                {
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                }
+
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        var t = new SqlDataRow();
+                        for(int i = 0; i < reader.FieldCount; i++)
+                        {
+                            t.Columns.Add(new SqlDataColumn
+                            {
+                                 ColumnName = reader.GetName(i),
+                                 Data = reader[i]
+                            });
+                        }
+                        rows.Add(t);
+                    }
+                }
+            }
+            return rows;
+        }
+
     }
+
+    public class SqlDataRow
+    {
+        public List<SqlDataColumn> Columns { get; set; }
+        public T Get<T>(string columnName)
+        {
+            return (T)Columns.First(x => x.ColumnName == columnName).Data;
+        }
+    }
+
+    public class SqlDataColumn
+    {
+        public string ColumnName { get; set; }
+        public object Data { get; set; }       
+    }
+
 }
