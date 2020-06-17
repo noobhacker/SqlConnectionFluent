@@ -8,4 +8,4 @@ var result = new SqlConnectionFluent("connectionstring")
                 .SetParameter("b_id", "string")
                 .ExecuteQuery<QueryResult>();
 ```
-The approach above uses reflection to retrieve property one by one from QueryResult, performance is unknown with huge number of rows. .ExecuteQuery() can be added that manually assign ordinals and map to user-specificed result object.
+The approach above uses reflection to retrieve property and set one by one from QueryResult, performance is unknown with huge number of rows. .ExecuteQuery() can be added that manually assign ordinals and map to user-specificed result object.
